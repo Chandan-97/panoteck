@@ -1,5 +1,7 @@
+import json
 from django.conf import settings
-from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from faker import Faker
@@ -11,9 +13,26 @@ from .models import Room
 fake = Faker()
 
 
+def chat_users(request):
+    users = User.objects.filter(is_superuser=False)
+    response = []
+    for user in users:
+        r = dict()
+        r["user_id"] = user.id
+        r["fname"] = user.first_name
+        r["lname"] = user.last_name
+        r["country"] = user.profile.location
+        r["timezone"] = user.profile.timezone
+        r["profile_pic"] = user.profile.profile_pic.url
+        r["is_online"] = user.profile.is_online
+        response.append(r)
+
+    return HttpResponse(json.dumps(response))
+
+
 def all_rooms(request):
     rooms = Room.objects.all()
-    return render(request, 'chat/index.html', {'rooms': rooms})
+    return render(request, 'panotek/index.html', {'rooms': rooms})
 
 
 def room_detail(request, slug):

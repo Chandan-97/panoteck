@@ -1,0 +1,414 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=yes">
+    <title>Chat Bot UI/UX & html for web Plugin | Css3 Transition </title>
+    <meta name="description" content="Chat Bot UI/UX & html for web" />
+    <meta name="keywords"
+        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin" />
+    <meta name="author" content="css3transition" />
+    <link rel="shortcut icon" href="{% static "panotek/img/favicon.ico" %}">
+    <meta name="description"
+        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin | Css3Transition " />
+    <meta name="keywords"
+        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin" />
+    <meta name="abstract"
+        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin">
+    <meta name="author" content="Rahul Yaduvanshi">
+    <meta name="technologies" content="HTML5, CSS3, HTML, CSS, JQUERY, Bootstrap, Angular">
+    <meta name="distribution" content="Global">
+    <meta name="development" content="Rahul Yaduvanshi">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="city" content="New Delhi">
+    <meta name="country" content="india">
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+    <link href="{% static "panotek/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css" />
+    <link href="{% static "panotek/css/main.css" %}" rel="stylesheet" type="text/css" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <link href="{% static "panotek/css/select2.min.css" %}" rel="stylesheet" type="text/css" />
+    <link href="{% static "panotek/css/chatBot.css" %}" rel="stylesheet" type="text/css" />
+    <link href="{% static "panotek/css/timeline.css" %}" rel="stylesheet" type="text/css" />
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="hide" id="state"></div>
+    <!-- Chat bot UI start -->
+    <div class="chat-screen">
+        <div class="chat-header">
+            <div class="chat-header-title">
+                Chatroom - Panoteck
+                <span class="chat-header-options hide">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-cog"></i>
+                    <i class="fas fa-sign-out-alt" id="logout"></i>
+                </span>
+            </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div class="chat-mail d-flex align-items-center">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-center">
+                    <h3> Login </h3>
+                </div>
+                <div id="login_error"></div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input type="email" id="email" class="form-control" placeholder="Email" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input type="password" id="password" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-rounded btn-block">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-users hide">
+            <div class="list-group" id="chat-users-list">
+            </div>
+            <div class="search-chat-users">
+                <input type="text" id="form1" class="form-control" placeholder="Search" aria-label="Search" />
+            </div>
+        </div>
+
+        <!--Chat Screen-->
+        <div class="chat-body hide">
+            <!--<div class="chat-start">Monday, 1:27 PM</div>-->
+            <div class="chat-bubble you">Hey There</div>
+            <div class="chat-bubble me">Hello, How can I help you</div>
+        </div>
+
+        <!--Chat Send Button-->
+        <div class="chat-input hide">
+            <input type="text" placeholder="Type a message...">
+            <div class="input-action-icon">
+                <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-paperclip">
+                        <path
+                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                        </path>
+                    </svg></a>
+                <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-send">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg></a>
+            </div>
+        </div>
+
+        <div class="chat-session-end hide">
+            <h5>This chat session has ended</h5>
+            <p>Thank you for chatting with us, If you can take a minute and rate this chat:</p>
+            <div class="rate-me">
+                <div class="rate-bubble great">
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-thumbs-up">
+                            <path
+                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                            </path>
+                        </svg></span>
+                    Great
+                </div>
+                <div class="rate-bubble bad">
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-thumbs-down">
+                            <path
+                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                            </path>
+                        </svg></span>
+                    Bad
+                </div>
+            </div>
+            <a class="transcript-chat">Need a Transcript?</a>
+            <div class="powered-by">Powered by css3transition</div>
+        </div>
+    </div>
+    <div class="chat-bot-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-message-square animate">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-x ">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </div>
+    <!-- Chat Bot UI Ends -->
+    <!-- Time line Html Start -->
+    <h1 class="hide">Responsive Timeline using Flexbox</h1>
+    <div class="timeline hide">
+        <div class="timeline-item">
+            <div class="timeline-date">
+                <img src="{% static "panotek/stylesheet/images/cities/delhi.svg" %}" />
+                <div>
+                    January 2019
+                </div>
+            </div>
+            <div class="timeline-content">
+                <h2>Journey Start <span>(Delhi)</span></h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
+                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
+                    numquam?<button type="button" class="visit">Visit ›</button><img
+                        src="{% static "panotek/stylesheet/images/cities/delhi.svg" %}" /></p>
+                <br>
+                <i class="fas fa-rocket fa-icon"></i>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-date">
+                <img src="{% static "stylesheet/images/cities/lucknow.svg" %}" />
+                <div>
+                    February 2019
+                </div>
+            </div>
+            <div class="timeline-content">
+                <h2>Nawabo ka Sehar<span>(Lucknow)</span></h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
+                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
+                    numquam?<button type="button" class="visit">Visit ›</button><img
+                        src="{% static "stylesheet/images/cities/lucknow.svg" %}" /></p>
+
+                <br>
+                <i class="fas fa-graduation-cap fa-icon"></i>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-date">
+                <img src="{% static "stylesheet/images/cities/prayagraj.svg" %}" />
+                <div>
+                    March 2019
+                </div>
+            </div>
+            <div class="timeline-content">
+                <h2>Devotional Place<span>(Prayagraj)</span></h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
+                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
+                    numquam?<button type="button" class="visit">Visit ›</button><img
+                        src="{% static "stylesheet/images/cities/prayagraj.svg" %}" /></p>
+
+                <br>
+                <i class="fas fa-power-off fa-icon"></i>
+            </div>
+        </div>
+    </div>
+    <script type="257be86a981729866f2fa61c-text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-83834093-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+    <script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js"
+        data-cf-settings="257be86a981729866f2fa61c-|49" defer=""></script>
+    <!-- Time line Html Ends -->
+    <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
+    <script src="{% static "panotek/js/jquery-3.1.1.min.js" %}"></script>
+    <script src="{% static "panotek/js/popper.min.js" %}"></script>
+    <script src="{% static "panotek/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "panotek/js/select2.min.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            $(".select2_el").select2({
+            });
+        });
+    </script>
+    <script>
+        function listChatUsers(){
+            $.ajax({
+                type: "GET",
+                data: {},
+                url: "/chat/chat_users/",
+                success: function(resp){
+                    let parent_element = document.getElementById("chat-users-list");
+                    parent_element.querySelectorAll('*').forEach(n => n.remove());
+                    let users = JSON.parse(resp);
+                    for(let i=0; i<users.length; ++i){
+                        user = users[i];
+                        let child = "";
+                        child += `<li class="list-group-item">`
+                        child += `<div class="row">`
+                        child += `<div class="chat-profile-pic" onclick="showChat(`+user.user_id+`)">`
+                        child += `<img src="`+user.profile_pic+`" class="img-rounded">`
+                        if (user.is_online == true){
+                            child += `<div class="online-status"></div>`
+                        }
+                        child += `</div>`
+                        child += `<div class="">`
+                        child += `<div class="box">`
+                        child += `<div class="name">`+user.fname + " " + user.lname+`</div>`
+                        child += `<div class="place">`+user.country+`</div>`
+                        child += `<div class="timezone">`+user.timezone+`</div>`
+                        child += `</div></div></div><hr></li>`
+                        let childelement = document.createRange().createContextualFragment(child);
+                        parent_element.appendChild(childelement);
+                    }
+
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            })
+        }
+
+        function showChat(user_id){
+            console.log(user_id);
+            $(".chat-users").addClass("hide");
+            $(".chat-body").removeClass("hide");
+            $(".chat-input").removeClass("hide")
+        }
+        $(document).ready(function () {
+            {% if user.is_authenticated %}
+                console.log("Authenticated")
+                $("#state").text("authenticated")
+                // Show Chat page directly
+                
+                $(".chat-bot-icon").click(function (e) {
+                    $(this).children('img').toggleClass('hide');
+                    $(this).children('svg').toggleClass('animate');
+                    $('.chat-screen').toggleClass('show-chat');
+                    $('.chat-mail').addClass('hide');
+                    $('.chat-users').removeClass('hide');
+                    $('.chat-header-options').removeClass('hide');
+                    $(".chat-body").addClass("hide");
+                    $(".chat-input").addClass("hide")
+                    listChatUsers();
+                });
+            {% else %}
+                console.log("Not Authenticated")
+                $("#state").text("notauthenticated")
+
+                // show login page
+                $(".chat-bot-icon").click(function (e) {
+                    $(this).children('img').toggleClass('hide');
+                    $(this).children('svg').toggleClass('animate');
+                    $('.chat-screen').toggleClass('show-chat');
+                    $(".chat-body").addClass("hide");
+                    $(".chat-input").addClass("hide")
+                });
+            {% endif %}
+
+            // Allow Login 
+            $(".chat-mail button").click(function () {
+                $email = $("#email").val()
+                $password = $("#password").val()
+
+                $.ajax({
+                    type: "POST",
+                    data: {
+                        "email": $email,
+                        "password": $password,
+                        "csrfmiddlewaretoken": '{{ csrf_token }}'
+                    },
+                    url: "/auth/login/",
+                    success: function(resp){
+                        console.log("Success: ", resp);
+                        $(".chat-mail").addClass('hide');
+                        $(".chat-users").removeClass('hide');
+                        $('.chat-header-options').removeClass('hide');
+                        $("#state").text("authenticated");
+                        listChatUsers();
+                    },
+                    error: function(err){
+                        console.log("Error: ", err.responseText)
+                        $("#login_error").text(err.responseText);
+                    }
+                })
+                $("#login_error").text("");
+                $("#password").val("");
+            })
+
+            $("#logout").click(function (e){
+                $.ajax({
+                    type: "POST",
+                    data: {
+                        "csrfmiddlewaretoken": '{{ csrf_token }}'
+                    },
+                    url: "/auth/logout/",
+                    success: function(resp){
+                        $(".chat-users").addClass('hide');
+                        $(".chat-mail").removeClass('hide');
+                        $(".chat-header-options").addClass('hide');
+                        $("#email").val("")
+                    },
+                    error: function(err){
+                        console.log("Error: ", err.responseText);
+                    }
+                })
+            })
+
+
+            //Toggle fullscreen
+            /*
+            $(".chat-bot-icon").click(function (e) {
+                $(this).children('img').toggleClass('hide');
+                $(this).children('svg').toggleClass('animate');
+                $('.chat-screen').toggleClass('show-chat');
+            });
+            $(".chat-mail button").click(function () {
+                // Login
+                $email = $("#email").val()
+                $password = $("#password").val()
+
+                $.ajax({
+                    type: "POST",
+                    data: {
+                        "email": $email,
+                        "password": $password,
+                        "csrfmiddlewaretoken": '{{ csrf_token }}'
+                    },
+                    url: "/auth/login/",
+                    success: function(resp){
+                        console.log("Success: ", resp);
+                        $(".chat-mail").addClass('hide');
+                        $(".chat-users").removeClass('hide');
+                        $('.chat-header-options').removeClass('hide');
+                    },
+                    error: function(err){
+                        console.log("Error: ", err.responseText)
+                        $("#login_error").text(err.responseText);
+                    }
+                })
+                $("#login_error").text("");
+                $("#password").val("");
+            })
+            $('.end-chat').click(function () {
+                $('.chat-body').addClass('hide');
+                $('.chat-input').addClass('hide');
+                $('.chat-session-end').removeClass('hide');
+                $('.chat-header-option').addClass('hide');
+            });
+            */
+        });
+    </script>
+
+</body>
+
+</html>
