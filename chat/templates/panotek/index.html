@@ -96,21 +96,16 @@
 
         <!--Chat Send Button-->
         <div class="chat-input hide">
-            <input type="text" placeholder="Type a message...">
-            <div class="input-action-icon">
-                <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="feather feather-paperclip">
-                        <path
-                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
-                        </path>
-                    </svg></a>
-                <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            <input type="text" placeholder="Type a message..." id="message_text">
+            <div class="input-action-icon" id="message_send">
+                <a>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-send">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg></a>
+                    </svg>
+                </a>
             </div>
         </div>
 
@@ -234,6 +229,10 @@
     <script src="{% static "panotek/js/popper.min.js" %}"></script>
     <script src="{% static "panotek/js/bootstrap.min.js" %}"></script>
     <script src="{% static "panotek/js/select2.min.js" %}"></script>
+    <script src="https://media.twiliocdn.com/sdk/js/common/v0.1/twilio-common.min.js"></script>
+    <script src="https://media.twiliocdn.com/sdk/js/chat/v2.0/twilio-chat.min.js"></script>
+    <script src="{% static "panotek/js/chat.js" %}"></script>
+
     <script>
         $(document).ready(function () {
             $(".select2_el").select2({
@@ -241,6 +240,14 @@
         });
     </script>
     <script>
+        let from_user_id = "";
+        {% if user.id %}
+            from_user_id = {{ user.id }}
+        {% endif %}
+        let chatClient;
+        let roomChannel;
+        let username;
+
         function listChatUsers(){
             $.ajax({
                 type: "GET",
@@ -278,12 +285,100 @@
             })
         }
 
-        function showChat(user_id){
-            console.log(user_id);
+        function showChat(to_user_id){
+            console.log("to_user_id: ",to_user_id)
+            console.log("from_user_id: ", from_user_id)
             $(".chat-users").addClass("hide");
             $(".chat-body").removeClass("hide");
-            $(".chat-input").removeClass("hide")
+            $(".chat-input").removeClass("hide");
+            let room_id = from_user_id + "--" + to_user_id;
+            getChatToken(room_id, from_user_id, to_user_id)
         }
+
+        function processPage(page) {
+            page.items.forEach(message => {
+                console.log(message.author, message.body);
+            });
+            if (page.hasNextPage) {
+                page.nextPage().then(processPage);
+            } else {
+                console.log("Done loading messages");
+            }
+        }
+
+        // Set up channel after it has been found / created
+        function setupChannel(name) {
+            roomChannel.join().then(function (channel) {
+                console.log(
+                    `Joined channel ${name} as <span class="me"> ${username} </span>.`,
+                    true
+                );
+                channel.getMessages(30).then(processPage);
+            });
+
+            // Listen for new messages sent to the channel
+            roomChannel.on("messageAdded", function (message) {
+                console.log("message.author : ", message.author)
+                console.log("message.body : ", message.body)
+                // printMessage(message.author, message.body);
+            });
+        }
+
+        // Add the createOrJoinChannel function below this line
+        function createOrJoinChannel(channelName) {
+            // Extract the room's channel name from the page URL
+            console.log("channelName: ", channelName)
+            console.log(`Attempting to join the "${channelName}" chat channel...`);
+
+            chatClient
+                .getChannelByUniqueName(channelName)
+                .then(function (channel) {
+                    roomChannel = channel;
+                    setupChannel(channelName);
+                })
+                .catch(function () {
+                    // If it doesn't exist, let's create it
+                    chatClient
+                        .createChannel({
+                            uniqueName: channelName,
+                            friendlyName: `${channelName} Chat Channel`
+                        })
+                        .then(function (channel) {
+                            roomChannel = channel;
+                            setupChannel(channelName);
+                        });
+                });
+        }
+
+        function getChatToken(room_id, from_user_id, to_user_id){
+            $.getJSON(
+                "/chat/token",
+                {
+                    device: "browser",
+                    identity: room_id,
+                    from_user_id: from_user_id,
+                    to_user_id: to_user_id
+                },
+                function (data) {
+                    username = data.identity;
+                    channel_name = data.identity
+                    Twilio.Chat.Client.create(data.token).then(client => {
+                        chatClient = client;
+                        chatClient.getSubscribedChannels().then(createOrJoinChannel(channel_name));
+                    });
+                }
+            );
+        }
+
+        $("#message_send").click(function(e){
+            let message = $("#message_text").val();
+            e.preventDefault();
+            if (roomChannel && message.trim().length > 0) {
+                roomChannel.sendMessage(message);
+                $("#message_text").val("");
+            }
+        })
+
         $(document).ready(function () {
             {% if user.is_authenticated %}
                 console.log("Authenticated")

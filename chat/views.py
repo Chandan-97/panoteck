@@ -41,18 +41,25 @@ def room_detail(request, slug):
 
 
 def token(request):
-    identity = request.GET.get('identity', fake.user_name())
+    from_user_id = request.GET.get('from_user_id', None)
+    to_user_id = request.GET.get('to_user_id', None)
     device_id = request.GET.get('device', 'default')  # unique device ID
+    from_user_name = User.objects.get(id=from_user_id).first_name
+    to_user_name = User.objects.get(id=to_user_id).first_name
+
+    room_id = min(from_user_id, to_user_id) + "--" + \
+        max(from_user_id, to_user_id)
 
     account_sid = settings.TWILIO_ACCOUNT_SID
     api_key = settings.TWILIO_API_KEY
     api_secret = settings.TWILIO_API_SECRET
     chat_service_sid = settings.TWILIO_CHAT_SERVICE_SID
 
-    token = AccessToken(account_sid, api_key, api_secret, identity=identity)
+    token = AccessToken(account_sid, api_key, api_secret,
+                        identity=from_user_name)
 
     # Create a unique endpoint ID for the device
-    endpoint = "MyDjangoChatRoom:{0}:{1}".format(identity, device_id)
+    endpoint = "MyDjangoChatRoom:{0}:{1}".format(room_id, device_id)
 
     if chat_service_sid:
         chat_grant = ChatGrant(endpoint_id=endpoint,
@@ -60,8 +67,12 @@ def token(request):
         token.add_grant(chat_grant)
 
     response = {
-        'identity': identity,
+        'from_user_name': from_user_name,
+        'to_user_name': to_user_name,
+        'identity': room_id,
         'token': token.to_jwt().decode('utf-8')
     }
+
+    print("Response: ", response)
 
     return JsonResponse(response)
