@@ -1,3 +1,6 @@
 .vscode/settings.json
 *.pyc
 .env
+*.idea
+*.xml
+.DS_Store

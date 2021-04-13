@@ -19,9 +19,11 @@ def Login(request):
         password = login_data.get("password")
 
         user = authenticate(username=username, password=password)
-        import pdb; pdb.set_trace()
         if user:
             login(request, user)
+            profile = user.profile
+            profile.is_online = True
+            profile.save()
             response["id"] = user.id
             response["status"] = True
             return HttpResponse(json.dumps(response))
@@ -31,8 +33,13 @@ def Login(request):
 
 @csrf_exempt
 def Logout(request):
+    if request.user.is_authenticated():
+        profile = request.user.profile
+        profile.is_online = False
+        profile.save()
     logout(request)
     return HttpResponse("Logout Successfull")
+
 
 @csrf_exempt
 def CurrentUser(request):

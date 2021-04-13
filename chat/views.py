@@ -3,12 +3,13 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.db.models import Q
 
 from faker import Faker
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import ChatGrant
 
-from .models import Room
+from .models import Room, Message
 
 fake = Faker()
 
@@ -88,3 +89,53 @@ def token(request):
     print("Response: ", response)
 
     return JsonResponse(response)
+
+
+def send_message(request):
+    data = request.POST
+    type = data["type"]
+    from_user_id = data["from_user_id"]
+
+    if type == "online_status":
+        profile = User.objects.get(id=from_user_id).profile
+        profile.is_online = data['status']
+        profile.save()
+        print("Status offline")
+
+    elif type == "chat":
+        to_user_id = data["to_user_id"]
+        body = data["body"]
+        from_user = User.objects.get(id=from_user_id)
+        to_user = User.objects.get(id=to_user_id)
+        Message(from_user=from_user, to_user=to_user, body=body).save()
+        print("Message Saved")
+
+
+def receive_message(request):
+    data = request.GET
+    from_user_id = data["from_user_id"]
+    from_user = User.objects.get(id=from_user_id)
+
+    to_user_id = data["to_user_id"]
+    to_user = User.objects.get(id=to_user_id)
+
+    type = data["type"]
+
+    if type is None:
+        messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user)
+                                          | Q(from_user=to_user, to_user=from_user)).order_by("-created_at")[:100]
+    else:
+        messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user, type=type)
+                                          | Q(from_user=to_user, to_user=from_user, type=type)).order_by("-created_at")[:100]
+
+    msg = []
+    for message in messages:
+        msg.append({
+            "from_user_id": message.from_user.id,
+            "from_user_name": message.from_user.first_name,
+            "to_user_id": message.to_user.id,
+            "to_user_name": message.to_user.first_name,
+            "body": message.body
+        })
+
+    return HttpResponse({"messages": json.dumps(msg)})
