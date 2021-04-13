@@ -33,7 +33,7 @@ def Login(request):
 
 @csrf_exempt
 def Logout(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         profile = request.user.profile
         profile.is_online = False
         profile.save()
@@ -46,7 +46,7 @@ def CurrentUser(request):
     user = request.user
     response = {}
     response["status"] = False
-    if user.is_authenticated():
+    if user.is_authenticated:
         response["status"] = True
         response["id"] = user.id
     return HttpResponse(json.dumps(response))

@@ -12,36 +12,12 @@ function createChatBubble(msg, sender){
 }
 
 
-function showChat(to_user_id){
-    console.log("to_user_id: ",to_user_id)
-    console.log("from_user_id: ", from_user_id)
+function showChat(){
     $(".chat-users").addClass("hide");
     $(".chat-body").removeClass("hide");
     $(".chat-input").removeClass("hide");
-    let room_id = from_user_id + "--" + to_user_id;
-    getChatToken(room_id, from_user_id, to_user_id)
 }
 
-
-function getChatToken(room_id, from_user_id, to_user_id){
-    $.getJSON(
-        "/chat/token",
-        {
-            device: "browser",
-            identity: room_id,
-            from_user_id: from_user_id,
-            to_user_id: to_user_id
-        },
-        function (data) {
-            username = data.identity;
-            channel_name = data.identity
-            Twilio.Chat.Client.create(data.token).then(client => {
-                chatClient = client;
-                chatClient.getSubscribedChannels().then(createOrJoinChannel(channel_name));
-            });
-        }
-    );
-}
 
 function listChatUsers(){
     $.ajax({
@@ -49,13 +25,14 @@ function listChatUsers(){
         data: {},
         url: "/chat/chat_users/",
         success: function(resp){
+            console.log("Response: ", resp)
             let parent_element = document.getElementById("chat-users-list");
-            parent_element.querySelectorAll('*').forEach(n => n.remove());
+            // parent_element.querySelectorAll('*').forEach(n => n.remove());
             let users = JSON.parse(resp);
             for(let i=0; i<users.length; ++i){
                 user = users[i];
                 let child = "";
-                child += `<li class="list-group-item">`
+                child += `<li class="list-group-item" id="user-chat-`+user.user_id+`">`
                 child += `<div class="row">`
                 child += `<div class="chat-profile-pic" onclick="showChat(`+user.user_id+`)">`
                 child += `<img src="`+user.profile_pic+`" class="img-rounded">`
@@ -68,7 +45,11 @@ function listChatUsers(){
                 child += `<div class="name">`+user.fname + " " + user.lname+`</div>`
                 child += `<div class="place">`+user.country+`</div>`
                 child += `<div class="timezone">`+user.timezone+`</div>`
-                child += `</div></div></div><hr></li>`
+                child += `</div></div>`
+                if(user.pending_messages_count > 0){
+                    child += `<div class="unread-message" id="unread-message-`+user.user_id+`">`+user.pending_messages_count+`</div>`
+                }
+                child += `</div><hr></li>`
                 let childelement = document.createRange().createContextualFragment(child);
                 parent_element.appendChild(childelement);
             }
@@ -105,10 +86,6 @@ $("#logout").click(function (e){
 
 $("#message_send").click(function(e){
     let message = $("#message_text").val();
-    e.preventDefault();
-    if (roomChannel && message.trim().length > 0) {
-        roomChannel.sendMessage(message);
-        $("#message_text").val("");
-    }
+    // Send api for chat
 })
 

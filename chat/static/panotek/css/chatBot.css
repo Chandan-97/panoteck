@@ -395,3 +395,15 @@
     border-radius: 50%;
     display: inline-block;
 }
+
+.unread-message{
+    margin-left: auto;
+    margin-top: 1rem;
+    background: #44c744;
+    border-radius: 55%;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    color: #f7f5f5;
+    font-size: 0.8rem;
+}

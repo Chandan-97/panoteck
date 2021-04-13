@@ -1,10 +1,11 @@
 import json
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db.models import Q
-
+from datetime import datetime, timedelta
 from faker import Faker
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import ChatGrant
@@ -14,7 +15,22 @@ from .models import Room, Message
 fake = Faker()
 
 
+def get_is_online(user):
+    if not user.is_authenticated:
+        return False
+    now = pytz.utc.localize(datetime.now())
+    if user.last_login and user.last_login <= now - timedelta(hours=8):
+        return True
+    return False
+
+
+def count_pending_messages(to_user, from_user):
+    pending_messages_count = Message.objects.filter(from_user=from_user, to_user=to_user, status=Message.SENT).count()
+    return pending_messages_count
+
+
 def chat_users(request):
+    current_user = request.user
     users = User.objects.filter(is_superuser=False)
     response = []
     for user in users:
@@ -25,7 +41,8 @@ def chat_users(request):
         r["country"] = user.profile.location
         r["timezone"] = user.profile.timezone
         r["profile_pic"] = user.profile.profile_pic.url
-        r["is_online"] = user.profile.is_online
+        r["is_online"] = get_is_online(user)
+        r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
         response.append(r)
 
     return HttpResponse(json.dumps(response))
@@ -119,14 +136,14 @@ def receive_message(request):
     to_user_id = data["to_user_id"]
     to_user = User.objects.get(id=to_user_id)
 
-    type = data["type"]
+    status = data["status"]
 
-    if type is None:
+    if status is None:
         messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user)
                                           | Q(from_user=to_user, to_user=from_user)).order_by("-created_at")[:100]
     else:
-        messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user, type=type)
-                                          | Q(from_user=to_user, to_user=from_user, type=type)).order_by("-created_at")[:100]
+        messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user, status=status)
+                                          | Q(from_user=to_user, to_user=from_user, status=status)).order_by("-created_at")[:100]
 
     msg = []
     for message in messages:

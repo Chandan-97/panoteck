@@ -7,25 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=yes">
     <title>Chat Bot UI/UX & html for web Plugin | Css3 Transition </title>
-    <meta name="description" content="Chat Bot UI/UX & html for web" />
-    <meta name="keywords"
-        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin" />
-    <meta name="author" content="css3transition" />
     <link rel="shortcut icon" href="{% static "panotek/img/favicon.ico" %}">
-    <meta name="description"
-        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin | Css3Transition " />
-    <meta name="keywords"
-        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin" />
-    <meta name="abstract"
-        content="Chat Bot UI/UX & html for web, UI/UX for chat bot, chat bot html, best chatbot, chatbot app, online chat bot plugin">
-    <meta name="author" content="Rahul Yaduvanshi">
-    <meta name="technologies" content="HTML5, CSS3, HTML, CSS, JQUERY, Bootstrap, Angular">
-    <meta name="distribution" content="Global">
-    <meta name="development" content="Rahul Yaduvanshi">
-    <meta name="robots" content="index, follow">
-    <meta name="googlebot" content="index, follow">
-    <meta name="city" content="New Delhi">
-    <meta name="country" content="india">
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
     <link href="{% static "panotek/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css" />
@@ -65,7 +47,7 @@
                 <div id="login_error"></div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <input type="email" id="email" class="form-control" placeholder="Email" autocomplete="off">
+                        <input type="text" id="email" class="form-control" placeholder="Username" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -81,7 +63,7 @@
 
         <div class="chat-users hide">
             <div class="list-group" id="chat-users-list">
-            </div>
+            </div>            
             <div class="search-chat-users">
                 <input type="text" id="form1" class="form-control" placeholder="Search" aria-label="Search" />
             </div>
@@ -108,35 +90,6 @@
                 </a>
             </div>
         </div>
-
-        <div class="chat-session-end hide">
-            <h5>This chat session has ended</h5>
-            <p>Thank you for chatting with us, If you can take a minute and rate this chat:</p>
-            <div class="rate-me">
-                <div class="rate-bubble great">
-                    <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-thumbs-up">
-                            <path
-                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-                            </path>
-                        </svg></span>
-                    Great
-                </div>
-                <div class="rate-bubble bad">
-                    <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-thumbs-down">
-                            <path
-                                d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-                            </path>
-                        </svg></span>
-                    Bad
-                </div>
-            </div>
-            <a class="transcript-chat">Need a Transcript?</a>
-            <div class="powered-by">Powered by css3transition</div>
-        </div>
     </div>
     <div class="chat-bot-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -151,74 +104,6 @@
             <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
     </div>
-    <!-- Chat Bot UI Ends -->
-    <!-- Time line Html Start -->
-    <h1 class="hide">Responsive Timeline using Flexbox</h1>
-    <div class="timeline hide">
-        <div class="timeline-item">
-            <div class="timeline-date">
-                <img src="{% static "panotek/stylesheet/images/cities/delhi.svg" %}" />
-                <div>
-                    January 2019
-                </div>
-            </div>
-            <div class="timeline-content">
-                <h2>Journey Start <span>(Delhi)</span></h2>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
-                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
-                    numquam?<button type="button" class="visit">Visit ›</button><img
-                        src="{% static "panotek/stylesheet/images/cities/delhi.svg" %}" /></p>
-                <br>
-                <i class="fas fa-rocket fa-icon"></i>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">
-                <img src="{% static "stylesheet/images/cities/lucknow.svg" %}" />
-                <div>
-                    February 2019
-                </div>
-            </div>
-            <div class="timeline-content">
-                <h2>Nawabo ka Sehar<span>(Lucknow)</span></h2>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
-                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
-                    numquam?<button type="button" class="visit">Visit ›</button><img
-                        src="{% static "stylesheet/images/cities/lucknow.svg" %}" /></p>
-
-                <br>
-                <i class="fas fa-graduation-cap fa-icon"></i>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-date">
-                <img src="{% static "stylesheet/images/cities/prayagraj.svg" %}" />
-                <div>
-                    March 2019
-                </div>
-            </div>
-            <div class="timeline-content">
-                <h2>Devotional Place<span>(Prayagraj)</span></h2>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad saepe nulla quibusdam ut. Beatae, facere
-                    sequi blanditiis porro suscipit tempore ipsam iste ipsa, culpa quam vero, dolorem cupiditate. Magni,
-                    numquam?<button type="button" class="visit">Visit ›</button><img
-                        src="{% static "stylesheet/images/cities/prayagraj.svg" %}" /></p>
-
-                <br>
-                <i class="fas fa-power-off fa-icon"></i>
-            </div>
-        </div>
-    </div>
-    <script type="257be86a981729866f2fa61c-text/javascript">
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-83834093-1', 'auto');
-    ga('send', 'pageview');
 
   </script>
     <script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js"
@@ -229,8 +114,6 @@
     <script src="{% static "panotek/js/popper.min.js" %}"></script>
     <script src="{% static "panotek/js/bootstrap.min.js" %}"></script>
     <script src="{% static "panotek/js/select2.min.js" %}"></script>
-    <script src="https://media.twiliocdn.com/sdk/js/common/v0.1/twilio-common.min.js"></script>
-    <script src="https://media.twiliocdn.com/sdk/js/chat/v2.0/twilio-chat.min.js"></script>
     <script src="{% static "panotek/js/chat.js" %}"></script>
 
     <script>
@@ -240,71 +123,6 @@
         });
     </script>
     <script>
-        let from_user_id = "";
-        {% if user.id %}
-            from_user_id = {{ user.id }}
-        {% endif %}
-        let chatClient;
-        let roomChannel;
-        let username;
-
-        function processPage(page) {
-            page.items.forEach(message => {
-                createChatBubble(message.body, message.author)
-                console.log(message.author, message.body);
-            });
-            if (page.hasNextPage) {
-                page.nextPage().then(processPage);
-            } else {
-                console.log("Done loading messages");
-            }
-        }
-
-        // Set up channel after it has been found / created
-        function setupChannel(name) {
-            roomChannel.join().then(function (channel) {
-                console.log(
-                    `Joined channel ${name} as <span class="me"> ${username} </span>.`,
-                    true
-                );
-                channel.getMessages(30).then(processPage);
-            });
-
-            // Listen for new messages sent to the channel
-            roomChannel.on("messageAdded", function (message) {
-                console.log("message.author : ", message.author)
-                console.log("message.body : ", message.body)
-                createChatBubble(message.body, message.author)
-                // printMessage(message.author, message.body);
-            });
-        }
-
-        // Add the createOrJoinChannel function below this line
-        function createOrJoinChannel(channelName) {
-            // Extract the room's channel name from the page URL
-            console.log("channelName: ", channelName)
-            console.log(`Attempting to join the "${channelName}" chat channel...`);
-
-            chatClient
-                .getChannelByUniqueName(channelName)
-                .then(function (channel) {
-                    roomChannel = channel;
-                    setupChannel(channelName);
-                })
-                .catch(function () {
-                    // If it doesn't exist, let's create it
-                    chatClient
-                        .createChannel({
-                            uniqueName: channelName,
-                            friendlyName: `${channelName} Chat Channel`
-                        })
-                        .then(function (channel) {
-                            roomChannel = channel;
-                            setupChannel(channelName);
-                        });
-                });
-        }
-
         $(document).ready(function () {
             {% if user.is_authenticated %}
                 console.log("Authenticated")
@@ -365,48 +183,6 @@
                 $("#login_error").text("");
                 $("#password").val("");
             })
-
-            //Toggle fullscreen
-            /*
-            $(".chat-bot-icon").click(function (e) {
-                $(this).children('img').toggleClass('hide');
-                $(this).children('svg').toggleClass('animate');
-                $('.chat-screen').toggleClass('show-chat');
-            });
-            $(".chat-mail button").click(function () {
-                // Login
-                $email = $("#email").val()
-                $password = $("#password").val()
-
-                $.ajax({
-                    type: "POST",
-                    data: {
-                        "email": $email,
-                        "password": $password,
-                        "csrfmiddlewaretoken": '{{ csrf_token }}'
-                    },
-                    url: "/auth/login/",
-                    success: function(resp){
-                        console.log("Success: ", resp);
-                        $(".chat-mail").addClass('hide');
-                        $(".chat-users").removeClass('hide');
-                        $('.chat-header-options').removeClass('hide');
-                    },
-                    error: function(err){
-                        console.log("Error: ", err.responseText)
-                        $("#login_error").text(err.responseText);
-                    }
-                })
-                $("#login_error").text("");
-                $("#password").val("");
-            })
-            $('.end-chat').click(function () {
-                $('.chat-body').addClass('hide');
-                $('.chat-input').addClass('hide');
-                $('.chat-session-end').removeClass('hide');
-                $('.chat-header-option').addClass('hide');
-            });
-            */
         });
     </script>
 
