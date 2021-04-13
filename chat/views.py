@@ -30,6 +30,18 @@ def chat_users(request):
     return HttpResponse(json.dumps(response))
 
 
+def user(request):
+    user_id = request.GET.get('user_id')
+    user = User.objects.get(id=user_id)
+    response = {
+        "username": user.username,
+        "fname": user.first_name,
+        "lname": user.last_name,
+        "profile_pic": user.profile.profile_pic.url
+    }
+    return HttpResponse(json.dumps(response))
+
+
 def all_rooms(request):
     rooms = Room.objects.all()
     return render(request, 'panotek/index.html', {'rooms': rooms})
