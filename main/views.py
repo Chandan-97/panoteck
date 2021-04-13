@@ -27,8 +27,8 @@ def Login(request):
             response["id"] = user.id
             response["status"] = True
             return HttpResponse(json.dumps(response))
-        return HttpResponseForbidden(json.dumps(response))
-    return HttpResponseBadRequest(json.dumps(response))
+        return HttpResponseForbidden("Invalid Username or Password")
+    return HttpResponseBadRequest("Invalid Username or Password")
 
 
 @csrf_exempt

@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import all_rooms, room_detail, token, chat_users, user, send_message, receive_message
+from .views import all_rooms, room_detail, token, chat_users, user, \
+    send_message, receive_message, poll_new_messages
 
 urlpatterns = [
     path('', all_rooms, name='all_rooms'),
@@ -8,5 +9,6 @@ urlpatterns = [
     path('chat_users/', chat_users, name="chat_users_list"),
     path('user/', user, name="user_detail"),
     path('send/', send_message, name="send_message"),
-    path('receive/', receive_message, name="receive_message")
+    path('receive/', receive_message, name="receive_message"),
+    path('poll_new_messages/', poll_new_messages, name="poll_message")
 ]

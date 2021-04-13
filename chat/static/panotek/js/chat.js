@@ -12,7 +12,44 @@ function createChatBubble(msg, sender){
 }
 
 
-function showChat(){
+function showChat(user_id){
+    let from_user_id = current_user_id
+    to_user_id = user_id
+    console.log("to_user_id: ",to_user_id)
+    console.log("from_user_id: ", from_user_id)
+    $.ajax({
+        type: "GET",
+        data:{
+            "from_user_id": from_user_id,
+            "to_user_id": to_user_id,
+        },
+        url: "/chat/receive/",
+        success: function(resp){
+            let parent_element = document.getElementById("chat-body");
+            parent_element.querySelectorAll('*').forEach(n => n.remove());
+
+            let messages = JSON.parse(resp);
+            for(let i=0; i<messages.length; ++i){
+                let message = messages[i]
+                if(message["from_user_id"] == from_user_id){
+                    createChatBubble(message["body"], "me");
+                }
+                else{
+                    createChatBubble(message["body"], "you");
+                }
+            }
+            
+            var height = 1000;
+            $('#chat-body .chat-bubble').each(function(i, value){
+                height += parseInt($(this).height());
+            });
+            
+            height += '';
+            
+            $('#chat-body').animate({scrollTop: height});
+        }
+    })
+
     $(".chat-users").addClass("hide");
     $(".chat-body").removeClass("hide");
     $(".chat-input").removeClass("hide");
@@ -27,7 +64,7 @@ function listChatUsers(){
         success: function(resp){
             console.log("Response: ", resp)
             let parent_element = document.getElementById("chat-users-list");
-            // parent_element.querySelectorAll('*').forEach(n => n.remove());
+            parent_element.querySelectorAll('*').forEach(n => n.remove());
             let users = JSON.parse(resp);
             for(let i=0; i<users.length; ++i){
                 user = users[i];
@@ -70,6 +107,7 @@ $("#logout").click(function (e){
         },
         url: "/auth/logout/",
         success: function(resp){
+            current_user_id = null;
             $(".chat-users").addClass('hide');
             $(".chat-mail").removeClass('hide');
             $(".chat-header-options").addClass('hide');
@@ -86,6 +124,31 @@ $("#logout").click(function (e){
 
 $("#message_send").click(function(e){
     let message = $("#message_text").val();
+    console.log(current_user_id)
+    console.log(to_user_id)
+    console.log(message)
     // Send api for chat
-})
 
+    $.ajax({
+        type: "POST",
+        data:{
+            "type": "chat",
+            "from_user_id": current_user_id,
+            "to_user_id": to_user_id,
+            "body": message
+        },
+        url: "/chat/send/",
+        success: function(resp){
+            console.log(resp);
+            createChatBubble(resp, "me");
+            $("#message_text").val("")
+
+            var height = 1000;
+            $('#chat-body .chat-bubble').each(function(i, value){
+                height += parseInt($(this).height());
+            });
+            height += '';
+            $('#chat-body').animate({scrollTop: height});
+        }
+    })
+})

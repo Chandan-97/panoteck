@@ -78,7 +78,7 @@
 
         <!--Chat Send Button-->
         <div class="chat-input hide">
-            <input type="text" placeholder="Type a message..." id="message_text">
+            <input type="text" placeholder="Type a message..." id="message_text" autocomplete="off">
             <div class="input-action-icon" id="message_send">
                 <a>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -123,8 +123,11 @@
         });
     </script>
     <script>
+        let current_user_id = null;
+        let to_user_id = null;
         $(document).ready(function () {
             {% if user.is_authenticated %}
+                current_user_id = {{user.id}}
                 console.log("Authenticated")
                 $("#state").text("authenticated")
                 // Show Chat page directly
@@ -168,6 +171,12 @@
                     },
                     url: "/auth/login/",
                     success: function(resp){
+                        resp = JSON.parse(resp);
+                        console.log(resp)
+                        console.log(resp["status"])
+                        if(resp["status"] == true){
+                            current_user_id = resp["id"]
+                        }
                         console.log("Success: ", resp);
                         $(".chat-mail").addClass('hide');
                         $(".chat-users").removeClass('hide');

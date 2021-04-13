@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from faker import Faker
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import ChatGrant
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Room, Message
 
@@ -16,10 +17,10 @@ fake = Faker()
 
 
 def get_is_online(user):
-    if not user.is_authenticated:
+    if user.profile.is_online == False:
         return False
     now = pytz.utc.localize(datetime.now())
-    if user.last_login and user.last_login <= now - timedelta(hours=8):
+    if user.last_login and user.last_login >= now - timedelta(hours=8):
         return True
     return False
 
@@ -107,7 +108,7 @@ def token(request):
 
     return JsonResponse(response)
 
-
+@csrf_exempt
 def send_message(request):
     data = request.POST
     type = data["type"]
@@ -125,8 +126,7 @@ def send_message(request):
         from_user = User.objects.get(id=from_user_id)
         to_user = User.objects.get(id=to_user_id)
         Message(from_user=from_user, to_user=to_user, body=body).save()
-        print("Message Saved")
-
+        return HttpResponse(body)
 
 def receive_message(request):
     data = request.GET
@@ -136,14 +136,14 @@ def receive_message(request):
     to_user_id = data["to_user_id"]
     to_user = User.objects.get(id=to_user_id)
 
-    status = data["status"]
+    status = data.get("status")
 
     if status is None:
         messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user)
-                                          | Q(from_user=to_user, to_user=from_user)).order_by("-created_at")[:100]
+                                          | Q(from_user=to_user, to_user=from_user)).order_by("created_at")[:100]
     else:
         messages = Message.objects.filter(Q(from_user=from_user, to_user=to_user, status=status)
-                                          | Q(from_user=to_user, to_user=from_user, status=status)).order_by("-created_at")[:100]
+                                          | Q(from_user=to_user, to_user=from_user, status=status)).order_by("created_at")[:100]
 
     msg = []
     for message in messages:
@@ -155,4 +155,33 @@ def receive_message(request):
             "body": message.body
         })
 
-    return HttpResponse({"messages": json.dumps(msg)})
+    Message.objects.filter(
+        from_user=to_user, to_user=from_user, status=Message.SENT
+    ).update(status=Message.RECEIVED)
+
+    return HttpResponse(json.dumps(msg))
+
+
+@csrf_exempt
+def poll_new_messages(request):
+    data = request.POST
+    from_user_id = data["from_user_id"]
+    from_user = User.objects.get(id=from_user_id)
+
+    to_user_id = data["to_user_id"]
+    to_user = User.objects.get(id=to_user_id)
+
+    new_messages = Message.objects.filter(from_user_id=from_user_id, to_user_id=to_user_id, status=Message.SENT).order_by("created_at")
+    msg = []
+    for message in new_messages:
+        msg.append({
+            "from_user_id": message.from_user.id,
+            "from_user_name": message.from_user.first_name,
+            "to_user_id": message.to_user.id,
+            "to_user_name": message.to_user.first_name,
+            "body": message.body
+        })
+    Message.objects.filter(
+        from_user=to_user, to_user=from_user, status=Message.SENT
+    ).update(status=Message.RECEIVED)
+    return HttpResponse(json.dumps(msg))

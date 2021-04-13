@@ -132,6 +132,7 @@
 
 .chat-body{
     width: 100%;
+    overflow: scroll;
 }
 
 .chat-screen .chat-body .chat-bubble.me {
