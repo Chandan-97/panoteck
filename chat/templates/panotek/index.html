@@ -47,7 +47,7 @@
     <div class="chat-screen">
         <div class="chat-header">
             <div class="chat-header-title">
-                Chatroom - Panoteck
+                Panoteck Chatroom
                 <span class="chat-header-options hide">
                     <i class="fas fa-map-marker-alt"></i>
                     <i class="fas fa-cog"></i>
@@ -88,10 +88,10 @@
         </div>
 
         <!--Chat Screen-->
-        <div class="chat-body hide">
+        <div class="chat-body hide" id="chat-body">
             <!--<div class="chat-start">Monday, 1:27 PM</div>-->
-            <div class="chat-bubble you">Hey There</div>
-            <div class="chat-bubble me">Hello, How can I help you</div>
+            <!--<div class="chat-bubble you">Hey There</div>-->
+            <!--<div class="chat-bubble me">Hello, How can I help you</div>-->
         </div>
 
         <!--Chat Send Button-->
@@ -248,55 +248,9 @@
         let roomChannel;
         let username;
 
-        function listChatUsers(){
-            $.ajax({
-                type: "GET",
-                data: {},
-                url: "/chat/chat_users/",
-                success: function(resp){
-                    let parent_element = document.getElementById("chat-users-list");
-                    parent_element.querySelectorAll('*').forEach(n => n.remove());
-                    let users = JSON.parse(resp);
-                    for(let i=0; i<users.length; ++i){
-                        user = users[i];
-                        let child = "";
-                        child += `<li class="list-group-item">`
-                        child += `<div class="row">`
-                        child += `<div class="chat-profile-pic" onclick="showChat(`+user.user_id+`)">`
-                        child += `<img src="`+user.profile_pic+`" class="img-rounded">`
-                        if (user.is_online == true){
-                            child += `<div class="online-status"></div>`
-                        }
-                        child += `</div>`
-                        child += `<div class="">`
-                        child += `<div class="box">`
-                        child += `<div class="name">`+user.fname + " " + user.lname+`</div>`
-                        child += `<div class="place">`+user.country+`</div>`
-                        child += `<div class="timezone">`+user.timezone+`</div>`
-                        child += `</div></div></div><hr></li>`
-                        let childelement = document.createRange().createContextualFragment(child);
-                        parent_element.appendChild(childelement);
-                    }
-
-                },
-                error: function(err){
-                    console.log(err);
-                }
-            })
-        }
-
-        function showChat(to_user_id){
-            console.log("to_user_id: ",to_user_id)
-            console.log("from_user_id: ", from_user_id)
-            $(".chat-users").addClass("hide");
-            $(".chat-body").removeClass("hide");
-            $(".chat-input").removeClass("hide");
-            let room_id = from_user_id + "--" + to_user_id;
-            getChatToken(room_id, from_user_id, to_user_id)
-        }
-
         function processPage(page) {
             page.items.forEach(message => {
+                createChatBubble(message.body, message.author)
                 console.log(message.author, message.body);
             });
             if (page.hasNextPage) {
@@ -320,6 +274,7 @@
             roomChannel.on("messageAdded", function (message) {
                 console.log("message.author : ", message.author)
                 console.log("message.body : ", message.body)
+                createChatBubble(message.body, message.author)
                 // printMessage(message.author, message.body);
             });
         }
@@ -350,35 +305,6 @@
                 });
         }
 
-        function getChatToken(room_id, from_user_id, to_user_id){
-            $.getJSON(
-                "/chat/token",
-                {
-                    device: "browser",
-                    identity: room_id,
-                    from_user_id: from_user_id,
-                    to_user_id: to_user_id
-                },
-                function (data) {
-                    username = data.identity;
-                    channel_name = data.identity
-                    Twilio.Chat.Client.create(data.token).then(client => {
-                        chatClient = client;
-                        chatClient.getSubscribedChannels().then(createOrJoinChannel(channel_name));
-                    });
-                }
-            );
-        }
-
-        $("#message_send").click(function(e){
-            let message = $("#message_text").val();
-            e.preventDefault();
-            if (roomChannel && message.trim().length > 0) {
-                roomChannel.sendMessage(message);
-                $("#message_text").val("");
-            }
-        })
-
         $(document).ready(function () {
             {% if user.is_authenticated %}
                 console.log("Authenticated")
@@ -404,7 +330,7 @@
                 $(".chat-bot-icon").click(function (e) {
                     $(this).children('img').toggleClass('hide');
                     $(this).children('svg').toggleClass('animate');
-                    $('.chat-screen').toggleClass('show-chat');
+                    $('.chat-screen').addClass('show-chat');
                     $(".chat-body").addClass("hide");
                     $(".chat-input").addClass("hide")
                 });
@@ -439,26 +365,6 @@
                 $("#login_error").text("");
                 $("#password").val("");
             })
-
-            $("#logout").click(function (e){
-                $.ajax({
-                    type: "POST",
-                    data: {
-                        "csrfmiddlewaretoken": '{{ csrf_token }}'
-                    },
-                    url: "/auth/logout/",
-                    success: function(resp){
-                        $(".chat-users").addClass('hide');
-                        $(".chat-mail").removeClass('hide');
-                        $(".chat-header-options").addClass('hide');
-                        $("#email").val("")
-                    },
-                    error: function(err){
-                        console.log("Error: ", err.responseText);
-                    }
-                })
-            })
-
 
             //Toggle fullscreen
             /*

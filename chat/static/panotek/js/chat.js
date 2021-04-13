@@ -1,76 +1,114 @@
-$(function () {
-    // Reference to the chat messages area
-    let $chatWindow = $("#messages");
-
-    // Our interface to the Chat client
-    let chatClient;
-
-    // A handle to the room's chat channel
-    let roomChannel;
-
-    // The server will assign the client a random username - stored here
-    let username;
-
-    // Helper function to print info messages to the chat window
-    function print(infoMessage, asHtml) {
-        let $msg = $('<div class="info">');
-        if (asHtml) {
-            $msg.html(infoMessage);
-        } else {
-            $msg.text(infoMessage);
-        }
-        $chatWindow.append($msg);
+function createChatBubble(msg, sender){
+    let chat_body = document.getElementById("chat-body");
+    let chatbubble = "";
+    if(sender == "me"){
+        chatbubble = `<div class="chat-bubble me">` + msg + `</div>`;
     }
-
-    // Helper function to print chat message to the chat window
-    function printMessage(fromUser, message) {
-        let $user = $('<span class="username">').text(fromUser + ":");
-        if (fromUser === username) {
-            $user.addClass("me");
-        }
-        let $message = $('<span class="message">').text(message);
-        let $container = $('<div class="message-container">');
-        $container.append($user).append($message);
-        $chatWindow.append($container);
-        $chatWindow.scrollTop($chatWindow[0].scrollHeight);
+    else{
+        chatbubble = `<div class="chat-bubble you">` + msg + `</div>`;
     }
+    let element = document.createRange().createContextualFragment(chatbubble);
+    chat_body.appendChild(element);
+}
 
-    // Get an access token for the current user, passing a device ID
-    // for browser-based apps, we'll just use the value "browser"
+
+function showChat(to_user_id){
+    console.log("to_user_id: ",to_user_id)
+    console.log("from_user_id: ", from_user_id)
+    $(".chat-users").addClass("hide");
+    $(".chat-body").removeClass("hide");
+    $(".chat-input").removeClass("hide");
+    let room_id = from_user_id + "--" + to_user_id;
+    getChatToken(room_id, from_user_id, to_user_id)
+}
+
+
+function getChatToken(room_id, from_user_id, to_user_id){
     $.getJSON(
         "/chat/token",
         {
-            device: "browser"
+            device: "browser",
+            identity: room_id,
+            from_user_id: from_user_id,
+            to_user_id: to_user_id
         },
         function (data) {
-            // Alert the user they have been assigned a random username
             username = data.identity;
-            print(
-                "You have been assigned a random username of: " +
-                '<span class="me">' +
-                username +
-                "</span>",
-                true
-            );
-
-            // Initialize the Chat client
+            channel_name = data.identity
             Twilio.Chat.Client.create(data.token).then(client => {
-                // Use client
                 chatClient = client;
-                chatClient.getSubscribedChannels().then(createOrJoinChannel);
+                chatClient.getSubscribedChannels().then(createOrJoinChannel(channel_name));
             });
-
         }
     );
+}
 
-    // Add newly sent messages to the channel
-    let $form = $("#message-form");
-    let $input = $("#message-input");
-    $form.on("submit", function (e) {
-        e.preventDefault();
-        if (roomChannel && $input.val().trim().length > 0) {
-            roomChannel.sendMessage($input.val());
-            $input.val("");
+function listChatUsers(){
+    $.ajax({
+        type: "GET",
+        data: {},
+        url: "/chat/chat_users/",
+        success: function(resp){
+            let parent_element = document.getElementById("chat-users-list");
+            parent_element.querySelectorAll('*').forEach(n => n.remove());
+            let users = JSON.parse(resp);
+            for(let i=0; i<users.length; ++i){
+                user = users[i];
+                let child = "";
+                child += `<li class="list-group-item">`
+                child += `<div class="row">`
+                child += `<div class="chat-profile-pic" onclick="showChat(`+user.user_id+`)">`
+                child += `<img src="`+user.profile_pic+`" class="img-rounded">`
+                if (user.is_online == true){
+                    child += `<div class="online-status"></div>`
+                }
+                child += `</div>`
+                child += `<div class="">`
+                child += `<div class="box">`
+                child += `<div class="name">`+user.fname + " " + user.lname+`</div>`
+                child += `<div class="place">`+user.country+`</div>`
+                child += `<div class="timezone">`+user.timezone+`</div>`
+                child += `</div></div></div><hr></li>`
+                let childelement = document.createRange().createContextualFragment(child);
+                parent_element.appendChild(childelement);
+            }
+
+        },
+        error: function(err){
+            console.log(err);
         }
-    });
-});
+    })
+}
+
+
+$("#logout").click(function (e){
+    $.ajax({
+        type: "POST",
+        data: {
+            "csrfmiddlewaretoken": '{{ csrf_token }}'
+        },
+        url: "/auth/logout/",
+        success: function(resp){
+            $(".chat-users").addClass('hide');
+            $(".chat-mail").removeClass('hide');
+            $(".chat-header-options").addClass('hide');
+            $(".chat-body").addClass('hide');
+            $(".chat-input").addClass('hide');
+            $("#email").val("")
+        },
+        error: function(err){
+            console.log("Error: ", err.responseText);
+        }
+    })
+})
+
+
+$("#message_send").click(function(e){
+    let message = $("#message_text").val();
+    e.preventDefault();
+    if (roomChannel && message.trim().length > 0) {
+        roomChannel.sendMessage(message);
+        $("#message_text").val("");
+    }
+})
+

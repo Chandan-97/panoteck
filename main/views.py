@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -10,20 +11,35 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def Login(request):
+    response = {}
+    response["status"] = False
     if(request.POST):
         login_data = request.POST.dict()
         username = login_data.get("email")
         password = login_data.get("password")
 
         user = authenticate(username=username, password=password)
+        import pdb; pdb.set_trace()
         if user:
             login(request, user)
-            return HttpResponse("Logged In")
-        return HttpResponseForbidden("Invalid email or password")
-    return HttpResponseBadRequest("Not found")
+            response["id"] = user.id
+            response["status"] = True
+            return HttpResponse(json.dumps(response))
+        return HttpResponseForbidden(json.dumps(response))
+    return HttpResponseBadRequest(json.dumps(response))
 
 
 @csrf_exempt
 def Logout(request):
     logout(request)
     return HttpResponse("Logout Successfull")
+
+@csrf_exempt
+def CurrentUser(request):
+    user = request.user
+    response = {}
+    response["status"] = False
+    if user.is_authenticated():
+        response["status"] = True
+        response["id"] = user.id
+    return HttpResponse(json.dumps(response))
