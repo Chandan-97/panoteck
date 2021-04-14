@@ -128,7 +128,6 @@
         $(document).ready(function () {
             {% if user.is_authenticated %}
                 current_user_id = {{user.id}}
-                console.log("Authenticated")
                 $("#state").text("authenticated")
                 // Show Chat page directly
                 
@@ -144,7 +143,6 @@
                     listChatUsers();
                 });
             {% else %}
-                console.log("Not Authenticated")
                 $("#state").text("notauthenticated")
 
                 // show login page
@@ -172,12 +170,10 @@
                     url: "/auth/login/",
                     success: function(resp){
                         resp = JSON.parse(resp);
-                        console.log(resp)
-                        console.log(resp["status"])
                         if(resp["status"] == true){
                             current_user_id = resp["id"]
                         }
-                        console.log("Success: ", resp);
+
                         $(".chat-mail").addClass('hide');
                         $(".chat-users").removeClass('hide');
                         $('.chat-header-options').removeClass('hide');
@@ -185,7 +181,6 @@
                         listChatUsers();
                     },
                     error: function(err){
-                        console.log("Error: ", err.responseText)
                         $("#login_error").text(err.responseText);
                     }
                 })

@@ -15,8 +15,6 @@ function createChatBubble(msg, sender){
 function showChat(user_id){
     let from_user_id = current_user_id
     to_user_id = user_id
-    console.log("to_user_id: ",to_user_id)
-    console.log("from_user_id: ", from_user_id)
     $.ajax({
         type: "GET",
         data:{
@@ -39,7 +37,7 @@ function showChat(user_id){
                 }
             }
             
-            var height = 1000;
+            var height = 100000;
             $('#chat-body .chat-bubble').each(function(i, value){
                 height += parseInt($(this).height());
             });
@@ -47,6 +45,26 @@ function showChat(user_id){
             height += '';
             
             $('#chat-body').animate({scrollTop: height});
+            setInterval(function (){
+                let from_user_id = user_id
+                let to_user_id = current_user_id
+            
+                $.ajax({
+                    type: "GET",
+                    data:{
+                        "from_user_id": from_user_id,
+                        "to_user_id": to_user_id
+                    },
+                    url: "/chat/poll_new_messages/",
+                    success: function(resp){
+                        let messages = JSON.parse(resp)
+                        for(let i=0; i<messages.length; ++i){
+                            let message = messages[i]
+                            createChatBubble(message["body"], "you");
+                        }
+                    }
+                })
+            }, 3000)
         }
     })
 
@@ -62,7 +80,6 @@ function listChatUsers(){
         data: {},
         url: "/chat/chat_users/",
         success: function(resp){
-            console.log("Response: ", resp)
             let parent_element = document.getElementById("chat-users-list");
             parent_element.querySelectorAll('*').forEach(n => n.remove());
             let users = JSON.parse(resp);
@@ -74,7 +91,10 @@ function listChatUsers(){
                 child += `<div class="chat-profile-pic" onclick="showChat(`+user.user_id+`)">`
                 child += `<img src="`+user.profile_pic+`" class="img-rounded">`
                 if (user.is_online == true){
-                    child += `<div class="online-status"></div>`
+                    child += `<div class="online-status" id="online-status-`+user.user_id+`"></div>`
+                }
+                else{
+                    child += `<div class="online-status hide" id="online-status-`+user.user_id+`"></div>`
                 }
                 child += `</div>`
                 child += `<div class="">`
@@ -85,6 +105,9 @@ function listChatUsers(){
                 child += `</div></div>`
                 if(user.pending_messages_count > 0){
                     child += `<div class="unread-message" id="unread-message-`+user.user_id+`">`+user.pending_messages_count+`</div>`
+                }
+                else{
+                    child += `<div class="unread-message hide" id="unread-message-`+user.user_id+`">`+user.pending_messages_count+`</div>`
                 }
                 child += `</div><hr></li>`
                 let childelement = document.createRange().createContextualFragment(child);
@@ -124,9 +147,6 @@ $("#logout").click(function (e){
 
 $("#message_send").click(function(e){
     let message = $("#message_text").val();
-    console.log(current_user_id)
-    console.log(to_user_id)
-    console.log(message)
     // Send api for chat
 
     $.ajax({
@@ -139,16 +159,44 @@ $("#message_send").click(function(e){
         },
         url: "/chat/send/",
         success: function(resp){
-            console.log(resp);
             createChatBubble(resp, "me");
             $("#message_text").val("")
-
-            var height = 1000;
-            $('#chat-body .chat-bubble').each(function(i, value){
-                height += parseInt($(this).height());
-            });
-            height += '';
-            $('#chat-body').animate({scrollTop: height});
         }
     })
 })
+
+let poll_data = setInterval(() => {
+    $.ajax({
+        type: "GET",
+        data: {},
+        url: "/chat/poll_data/",
+        success: function(resp){
+            resp = JSON.parse(resp)
+            if(resp["status"]){
+                for(var user_id in resp["data"]){
+                    let r = resp["data"][user_id]
+                    let online_status = r["is_online"]
+                    let pending_messages_count = r["pending_messages_count"]
+
+                    let id = "#online-status-" + user_id
+                    if(online_status){
+                        $(id).removeClass('hide')
+                    }
+                    else{
+                        $(id).addClass('hide')
+                    }
+
+                    id = "#unread-message-" + user_id
+                    if(pending_messages_count > 0){
+                        $(id).text(pending_messages_count)
+                        $(id).removeClass('hide')
+                    }
+                    else{
+                        $(id).addClass('hide')
+                    }
+                }
+            }
+        }
+    })
+}, (5000));
+

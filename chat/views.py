@@ -12,6 +12,7 @@ from twilio.jwt.access_token.grants import ChatGrant
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Room, Message
+from main.models import UserProfile
 
 fake = Faker()
 
@@ -162,9 +163,8 @@ def receive_message(request):
     return HttpResponse(json.dumps(msg))
 
 
-@csrf_exempt
 def poll_new_messages(request):
-    data = request.POST
+    data = request.GET
     from_user_id = data["from_user_id"]
     from_user = User.objects.get(id=from_user_id)
 
@@ -182,6 +182,25 @@ def poll_new_messages(request):
             "body": message.body
         })
     Message.objects.filter(
-        from_user=to_user, to_user=from_user, status=Message.SENT
+        from_user=from_user, to_user=to_user, status=Message.SENT
     ).update(status=Message.RECEIVED)
     return HttpResponse(json.dumps(msg))
+
+
+def poll_data(request):
+    user_ids = User.objects.filter(is_superuser=False).values("id")
+    user_data = {}
+    # import pdb; pdb.set_trace()
+    for id in user_ids:
+        # online_status
+        id = id.get('id')
+        user = User.objects.get(id=id)
+
+        user_data[id] = {
+            "is_online": get_is_online(user),
+            "pending_messages_count" : count_pending_messages(to_user=request.user, from_user=user)
+        }
+
+    response = {"status": True, "data": user_data}
+    return HttpResponse(json.dumps(response))
+
