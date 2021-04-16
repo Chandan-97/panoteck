@@ -64,7 +64,7 @@ function showChat(user_id){
                         }
                     }
                 })
-            }, 3000)
+            }, 30000)
         }
     })
 
@@ -198,5 +198,35 @@ let poll_data = setInterval(() => {
             }
         }
     })
-}, (5000));
+}, (50000));
 
+function loadLocations(){
+    $.ajax({
+        type: "GET",
+        data: {},
+        url: "/chat/list_office_loc/",
+        success: function(resp){
+            resp = JSON.parse(resp)
+            console.log("LOCATIONS: ", resp)
+            let parent = document.getElementById("location-options")
+            for(let i=0; i<resp.length; ++i){
+                let location = resp[i]
+                let element = `<a class="dropdown-item" onclick=setLocation(`+location.id+`)>` +location.loc+ `</a>`
+
+                element = document.createRange().createContextualFragment(element);
+                parent.appendChild(element);
+            }
+        }
+    })
+}
+
+function setLocation(loc_id){
+    $.ajax({
+        type: "GET",
+        data: {"id": loc_id},
+        url: "/chat/set_location/",
+        success: function(resp){
+            console.log(resp)
+        }
+    })
+}

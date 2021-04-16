@@ -1,5 +1,6 @@
 import json
 import pytz
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -12,7 +13,7 @@ from twilio.jwt.access_token.grants import ChatGrant
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Room, Message
-from main.models import UserProfile
+from main.models import OfficeLocation
 
 fake = Faker()
 
@@ -31,23 +32,73 @@ def count_pending_messages(to_user, from_user):
     return pending_messages_count
 
 
+def get_timezone(tz):
+    try:
+        now = datetime.now(pytz.timezone(tz))
+        tz = now.strftime('%z')[:3] + ":" + now.strftime('%z')[3:] + ", " + now.strftime("%H:%m")
+    except:
+        pass
+    return tz
+
 def chat_users(request):
     current_user = request.user
-    users = User.objects.filter(is_superuser=False)
+
+    user = User.objects.get(is_superuser=False, first_name__iexact="Receptionist")
     response = []
+    ids = []
+    if user:
+        r = dict()
+        profile = user.profile
+        r["user_id"] = user.id
+        ids.append(user.id)
+        r["fname"] = user.first_name
+        r["lname"] = user.last_name
+        r["country"] = "--"
+        r["timezone"] = "--"
+        r["profile_pic"] = profile.profile_pic.url
+        r["office_loc"] = profile.office_loc
+        r["is_online"] = get_is_online(user)
+        r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
+        response.append(r)
+
+    users = User.objects.filter(is_superuser=False).exclude(id__in=ids)
     for user in users:
         r = dict()
+        profile = user.profile
         r["user_id"] = user.id
         r["fname"] = user.first_name
         r["lname"] = user.last_name
-        r["country"] = user.profile.location
-        r["timezone"] = user.profile.timezone
-        r["profile_pic"] = user.profile.profile_pic.url
+        r["country"] = profile.location
+        r["timezone"] = get_timezone(profile.timezone)
+        r["profile_pic"] = profile.profile_pic.url
+        r["office_loc"] = profile.office_loc
         r["is_online"] = get_is_online(user)
         r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
         response.append(r)
 
     return HttpResponse(json.dumps(response))
+
+
+def list_location(request):
+    locations = OfficeLocation.objects.all()
+    loc = []
+    for l in locations:
+        loc.append({
+            "id": l.id,
+            "loc": l.loc,
+            "logo": l.logo.url if l.logo else None
+        })
+
+    return HttpResponse(json.dumps(loc))
+
+
+def set_location(request):
+    id = request.GET["id"]
+    profile = request.user.profile
+    loc = OfficeLocation.objects.get(id=id)
+    profile.office_loc = loc
+    profile.save()
+    return HttpResponse("Saved")
 
 
 def user(request):
@@ -190,7 +241,6 @@ def poll_new_messages(request):
 def poll_data(request):
     user_ids = User.objects.filter(is_superuser=False).values("id")
     user_data = {}
-    # import pdb; pdb.set_trace()
     for id in user_ids:
         # online_status
         id = id.get('id')

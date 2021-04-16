@@ -11,6 +11,14 @@ class Designation(models.Model):
         return self.name
 
 
+class OfficeLocation(models.Model):
+    loc = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to="office_loc/", null=True, blank=True)
+
+    def __str__(self):
+        return self.loc
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="profile")
@@ -21,6 +29,8 @@ class UserProfile(models.Model):
     designation = models.ForeignKey(
         Designation, on_delete=models.CASCADE, related_name="users", null=True, blank=True)
     is_online = models.BooleanField(default=False)
+    office_loc = models.ForeignKey(OfficeLocation, on_delete=models.CASCADE, related_name="users",
+                                   null=True, blank=True)
 
     def __str__(self):
         return self.user.username

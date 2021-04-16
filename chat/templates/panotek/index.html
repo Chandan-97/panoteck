@@ -31,12 +31,16 @@
             <div class="chat-header-title">
                 Panoteck Chatroom
                 <span class="chat-header-options hide">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <i class="fas fa-cog"></i>
+                    <i class=" fas fa-map-marker-alt dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="location-options">
+                        </div>
+                    </i>
+                    <i class="fas fa-cog dropdown"></i>
                     <i class="fas fa-sign-out-alt" id="logout"></i>
                 </span>
             </div>
         </div>
+
 
         <!-- Login Screen -->
         <div class="chat-mail d-flex align-items-center">
@@ -70,11 +74,17 @@
         </div>
 
         <!--Chat Screen-->
+        <div class="chat-header-bottom">
+            <div class="chat-header-bottom__icon"><a href="#"><i class="fas fa-arrow-left"></i></a></div>
+            <div class="chat-header-bottom__name"><p>John Doe</p></div>
+        </div>
         <div class="chat-body hide" id="chat-body">
             <!--<div class="chat-start">Monday, 1:27 PM</div>-->
             <!--<div class="chat-bubble you">Hey There</div>-->
             <!--<div class="chat-bubble me">Hello, How can I help you</div>-->
         </div>
+
+        
 
         <!--Chat Send Button-->
         <div class="chat-input hide">
@@ -129,6 +139,7 @@
             {% if user.is_authenticated %}
                 current_user_id = {{user.id}}
                 $("#state").text("authenticated")
+                loadLocations();
                 // Show Chat page directly
                 
                 $(".chat-bot-icon").click(function (e) {
@@ -142,6 +153,8 @@
                     $(".chat-input").addClass("hide")
                     listChatUsers();
                 });
+
+
             {% else %}
                 $("#state").text("notauthenticated")
 
