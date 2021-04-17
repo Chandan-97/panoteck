@@ -74,9 +74,9 @@
         </div>
 
         <!--Chat Screen-->
-        <div class="chat-header-bottom">
-            <div class="chat-header-bottom__icon"><a href="#"><i class="fas fa-arrow-left"></i></a></div>
-            <div class="chat-header-bottom__name"><p>John Doe</p></div>
+        <div class="chat-header-bottom hide">
+            <div class="chat-header-bottom__icon"><a  href="#" onclick="moveback()" style="padding: 10px;"><i class="fas fa-arrow-left"></i></a></div>
+            <div class="chat-header-bottom__name">John Doe</div>
         </div>
         <div class="chat-body hide" id="chat-body">
             <!--<div class="chat-start">Monday, 1:27 PM</div>-->
@@ -134,10 +134,12 @@
     </script>
     <script>
         let current_user_id = null;
+        let current_user_fname = null;
         let to_user_id = null;
         $(document).ready(function () {
             {% if user.is_authenticated %}
                 current_user_id = {{user.id}}
+                current_user_fname = "{{ user.first_name }}";
                 $("#state").text("authenticated")
                 loadLocations();
                 // Show Chat page directly
@@ -185,6 +187,8 @@
                         resp = JSON.parse(resp);
                         if(resp["status"] == true){
                             current_user_id = resp["id"]
+                            current_user_fname = resp["fname"]
+                            $(".chat-header-bottom__name").text(current_user_fname)
                         }
 
                         $(".chat-mail").addClass('hide');

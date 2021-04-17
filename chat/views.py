@@ -40,6 +40,18 @@ def get_timezone(tz):
         pass
     return tz
 
+
+def get_office_loc(profile):
+    loc = profile.office_loc
+    if loc:
+        return {
+            "id": loc.id,
+            "loc": loc.loc,
+            "logo": loc.logo.url if loc.logo else None
+        }
+    return {}
+
+
 def chat_users(request):
     current_user = request.user
 
@@ -71,7 +83,7 @@ def chat_users(request):
         r["country"] = profile.location
         r["timezone"] = get_timezone(profile.timezone)
         r["profile_pic"] = profile.profile_pic.url
-        r["office_loc"] = profile.office_loc
+        r["office_loc"] = get_office_loc(profile)
         r["is_online"] = get_is_online(user)
         r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
         response.append(r)

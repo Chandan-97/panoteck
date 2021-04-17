@@ -50,6 +50,7 @@ def Login(request):
             profile.is_online = True
             profile.save()
             response["id"] = user.id
+            response["fname"] = user.first_name
             response["status"] = True
             return HttpResponse(json.dumps(response))
         return HttpResponseForbidden("Invalid Username or Password")

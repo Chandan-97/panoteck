@@ -64,13 +64,15 @@ function showChat(user_id){
                         }
                     }
                 })
-            }, 30000)
+            }, 3000)
         }
     })
 
+    $(".chat-header-bottom__name").text(current_user_fname)
     $(".chat-users").addClass("hide");
     $(".chat-body").removeClass("hide");
     $(".chat-input").removeClass("hide");
+    $(".chat-header-bottom").removeClass("hide");
 }
 
 
@@ -131,11 +133,13 @@ $("#logout").click(function (e){
         url: "/auth/logout/",
         success: function(resp){
             current_user_id = null;
+            current_user_fname = null;
             $(".chat-users").addClass('hide');
             $(".chat-mail").removeClass('hide');
             $(".chat-header-options").addClass('hide');
             $(".chat-body").addClass('hide');
             $(".chat-input").addClass('hide');
+            $(".chat-header-bottom").addClass("hide");
             $("#email").val("")
         },
         error: function(err){
@@ -198,7 +202,7 @@ let poll_data = setInterval(() => {
             }
         }
     })
-}, (50000));
+}, (5000));
 
 function loadLocations(){
     $.ajax({
@@ -229,4 +233,14 @@ function setLocation(loc_id){
             console.log(resp)
         }
     })
+}
+
+function moveback(){
+    $('.chat-mail').addClass('hide');
+    $('.chat-users').removeClass('hide');
+    $('.chat-header-options').removeClass('hide');
+    $(".chat-body").addClass("hide");
+    $(".chat-input").addClass("hide")
+    $(".chat-header-bottom").addClass("hide");
+    listChatUsers();
 }

@@ -1,9 +1,15 @@
+aiohttp==3.7.4.post0
 asgiref==3.3.1
+async-timeout==3.0.1
+attrs==20.3.0
 certifi==2020.12.5
 chardet==4.0.0
 Django==3.1.7
 Faker==7.0.1
+geoip2==4.1.0
 idna==2.10
+maxminddb==2.0.3
+multidict==5.1.0
 Pillow==8.2.0
 PyJWT==1.7.1
 python-dateutil==2.8.1
@@ -14,4 +20,6 @@ six==1.15.0
 sqlparse==0.4.1
 text-unidecode==1.3
 twilio==6.55.0
+typing-extensions==3.7.4.3
 urllib3==1.26.4
+yarl==1.6.3
