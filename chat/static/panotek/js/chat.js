@@ -211,7 +211,6 @@ function loadLocations(){
         url: "/chat/list_office_loc/",
         success: function(resp){
             resp = JSON.parse(resp)
-            console.log("LOCATIONS: ", resp)
             let parent = document.getElementById("location-options")
             for(let i=0; i<resp.length; ++i){
                 let location = resp[i]
