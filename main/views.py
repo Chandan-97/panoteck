@@ -2,6 +2,7 @@ import json
 import requests
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
@@ -59,23 +60,30 @@ def Login(request):
 
 @csrf_exempt
 def Logout(request):
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.profile
-            profile.is_online = False
-            profile.save()
-        except Exception as e:
-            pass
+    current_user_id = request.GET.get('current_user_id')
+    try:
+        user = User.objects.get(id=current_user_id)
+        profile = user.profile
+        profile.is_online = False
+        profile.save()
+    except Exception as e:
+        pass
     logout(request)
     return HttpResponse("Logout Successfull")
 
 
 @csrf_exempt
 def CurrentUser(request):
-    user = request.user
+    current_user_id = request.GET.get('current_user_id')
+    user = None
+    try:
+        user = User.objects.get(id=current_user_id)
+    except:
+        pass
     response = {}
     response["status"] = False
-    if user.is_authenticated:
+    if user:
         response["status"] = True
         response["id"] = user.id
+        response["fname"] = user.first_name
     return HttpResponse(json.dumps(response))

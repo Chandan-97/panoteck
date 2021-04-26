@@ -16,12 +16,16 @@ function showChat(user_id){
     let from_user_id = current_user_id
     to_user_id = user_id
     $.ajax({
+        crossDomain: true,
+        xhrFields: {
+            withCredentials: true,
+        },
         type: "GET",
         data:{
             "from_user_id": from_user_id,
             "to_user_id": to_user_id,
         },
-        url: "/chat/receive/",
+        url: get_url("/chat/receive/"),
         success: function(resp){
             let parent_element = document.getElementById("chat-body");
             parent_element.querySelectorAll('*').forEach(n => n.remove());
@@ -51,11 +55,15 @@ function showChat(user_id){
             
                 $.ajax({
                     type: "GET",
+                    crossDomain: true,
+                    xhrFields: {
+                        withCredentials: true,
+                    },
                     data:{
                         "from_user_id": from_user_id,
                         "to_user_id": to_user_id
                     },
-                    url: "/chat/poll_new_messages/",
+                    url: get_url("/chat/poll_new_messages/"),
                     success: function(resp){
                         let messages = JSON.parse(resp)
                         for(let i=0; i<messages.length; ++i){
@@ -78,9 +86,15 @@ function showChat(user_id){
 
 function listChatUsers(){
     $.ajax({
+        crossDomain: true,
         type: "GET",
-        data: {},
-        url: "/chat/chat_users/",
+        data: {
+            "current_user_id": current_user_id,
+        },
+        xhrFields: {
+            withCredentials: true,
+        },
+        url: get_url("/chat/chat_users/"),
         success: function(resp){
             let parent_element = document.getElementById("chat-users-list");
             parent_element.querySelectorAll('*').forEach(n => n.remove());
@@ -126,11 +140,16 @@ function listChatUsers(){
 
 $("#logout").click(function (e){
     $.ajax({
+        crossDomain: true,
         type: "POST",
-        data: {
-            "csrfmiddlewaretoken": '{{ csrf_token }}'
+        xhrFields: {
+            withCredentials: true,
         },
-        url: "/auth/logout/",
+        data: {
+            "csrfmiddlewaretoken": '{{ csrf_token }}',
+            "current_user_id": current_user_id,
+        },
+        url: get_url("/auth/logout/"),
         success: function(resp){
             current_user_id = null;
             current_user_fname = null;
@@ -154,14 +173,18 @@ $("#message_send").click(function(e){
     // Send api for chat
 
     $.ajax({
+        crossDomain: true,
         type: "POST",
+        xhrFields: {
+            withCredentials: true,
+        },
         data:{
             "type": "chat",
             "from_user_id": current_user_id,
             "to_user_id": to_user_id,
             "body": message
         },
-        url: "/chat/send/",
+        url: get_url("/chat/send/"),
         success: function(resp){
             createChatBubble(resp, "me");
             $("#message_text").val("")
@@ -171,9 +194,15 @@ $("#message_send").click(function(e){
 
 let poll_data = setInterval(() => {
     $.ajax({
+        crossDomain: true,
+        xhrFields: {
+            withCredentials: true,
+        },
         type: "GET",
-        data: {},
-        url: "/chat/poll_data/",
+        data: {
+            "current_user_id": current_user_id,
+        },
+        url: get_url("/chat/poll_data/"),
         success: function(resp){
             resp = JSON.parse(resp)
             if(resp["status"]){
@@ -206,9 +235,13 @@ let poll_data = setInterval(() => {
 
 function loadLocations(){
     $.ajax({
+        crossDomain: true,
         type: "GET",
+        xhrFields: {
+            withCredentials: true,
+        },
         data: {},
-        url: "/chat/list_office_loc/",
+        url: get_url("/chat/list_office_loc/"),
         success: function(resp){
             resp = JSON.parse(resp)
             let parent = document.getElementById("location-options")
@@ -225,9 +258,16 @@ function loadLocations(){
 
 function setLocation(loc_id){
     $.ajax({
+        crossDomain: true,
+        xhrFields: {
+            withCredentials: true,
+        },
         type: "GET",
-        data: {"id": loc_id},
-        url: "/chat/set_location/",
+        data: {
+            "id": loc_id,
+            "current_user_id": current_user_id
+        },
+        url: get_url("/chat/set_location/"),
         success: function(resp){
             console.log(resp)
         }

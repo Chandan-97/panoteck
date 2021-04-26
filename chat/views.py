@@ -53,7 +53,8 @@ def get_office_loc(profile):
 
 
 def chat_users(request):
-    current_user = request.user
+    current_user_id = request.GET.get('current_user_id')
+    current_user = User.objects.get(id=current_user_id)
 
     user = User.objects.get(is_superuser=False, first_name__iexact="Receptionist")
     response = []
@@ -67,7 +68,7 @@ def chat_users(request):
         r["lname"] = user.last_name
         r["country"] = "--"
         r["timezone"] = "--"
-        r["profile_pic"] = profile.profile_pic.url
+        r["profile_pic"] = request.build_absolute_uri(profile.profile_pic.url)
         r["office_loc"] = profile.office_loc
         r["is_online"] = get_is_online(user)
         r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
@@ -82,7 +83,7 @@ def chat_users(request):
         r["lname"] = user.last_name
         r["country"] = profile.location
         r["timezone"] = get_timezone(profile.timezone)
-        r["profile_pic"] = profile.profile_pic.url
+        r["profile_pic"] = request.build_absolute_uri(profile.profile_pic.url)
         r["office_loc"] = get_office_loc(profile)
         r["is_online"] = get_is_online(user)
         r["pending_messages_count"] = count_pending_messages(to_user=current_user, from_user=user)
@@ -105,8 +106,10 @@ def list_location(request):
 
 
 def set_location(request):
+    current_user_id = request.GET.get('current_user_id')
+    user = User.objects.get(id=current_user_id)
     id = request.GET["id"]
-    profile = request.user.profile
+    profile = user.profile
     loc = OfficeLocation.objects.get(id=id)
     profile.office_loc = loc
     profile.save()
@@ -127,7 +130,7 @@ def user(request):
 
 def all_rooms(request):
     rooms = Room.objects.all()
-    return render(request, 'panotek/index.html', {'rooms': rooms})
+    return render(request, 'panoteck/index.html', {'rooms': rooms})
 
 
 def room_detail(request, slug):
@@ -251,6 +254,15 @@ def poll_new_messages(request):
 
 
 def poll_data(request):
+    current_user_id = request.GET.get('current_user_id')
+    current_user = None
+    try:
+        current_user = User.objects.get(id=current_user_id)
+    except:
+        pass
+    if not current_user:
+        response = {"status": False, "data": []}
+        return HttpResponse(json.dumps(response))
     user_ids = User.objects.filter(is_superuser=False).values("id")
     user_data = {}
     for id in user_ids:
@@ -260,7 +272,7 @@ def poll_data(request):
 
         user_data[id] = {
             "is_online": get_is_online(user),
-            "pending_messages_count" : count_pending_messages(to_user=request.user, from_user=user)
+            "pending_messages_count" : count_pending_messages(to_user=current_user, from_user=user)
         }
 
     response = {"status": True, "data": user_data}
